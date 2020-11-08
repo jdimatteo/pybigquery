@@ -260,6 +260,32 @@ def test_unicode(engine, table_one_row):
     assert returned_str == unicode_str
 
 
+def test_col_name_same_as_table(engine_using_test_dataset):
+    # ensure query works when column not same as table
+    query = sqlalchemy.select([sqlalchemy.column('foo')]).select_from(sqlalchemy.table('sample_col_name_same_as_table'))
+    results = engine_using_test_dataset.execute(query).fetchall()
+    expected_value = [(3,), (4,)]
+    assert results == expected_value
+
+    # same query works when prefix column with table name
+    query = sqlalchemy.select([sqlalchemy.column('sample_col_name_same_as_table.foo')]).select_from(sqlalchemy.table('sample_col_name_same_as_table'))
+    results = engine_using_test_dataset.execute(query).fetchall()
+    expected_value = [(3,), (4,)]
+    assert results == expected_value
+
+    # prefixing the table name works when column name matches table name
+    query = sqlalchemy.select([sqlalchemy.column('sample_col_name_same_as_table.sample_col_name_same_as_table')]).select_from(sqlalchemy.table('sample_col_name_same_as_table'))
+    results = engine_using_test_dataset.execute(query).fetchall()
+    expected_value = [(1,), (2,)]
+    assert results == expected_value
+
+    # but query doesn't work when column same as table without table prefix
+    query = sqlalchemy.select([sqlalchemy.column('sample_col_name_same_as_table')]).select_from(sqlalchemy.table('sample_col_name_same_as_table'))
+    results = engine_using_test_dataset.execute(query).fetchall()
+    expected_value = [(1,), (2,)]
+    assert results == expected_value
+
+
 def test_reflect_select_shared_table(engine):
     one_row = Table('bigquery-public-data.samples.natality', MetaData(bind=engine), autoload=True)
     row = one_row.select().limit(1).execute().first()

@@ -1,0 +1,11 @@
+[{
+  "mode": "NULLABLE",
+  "name": "sample_col_name_same_as_table",
+  "type": "INTEGER"
+},
+{
+  "mode": "NULLABLE",
+  "name": "foo",
+  "type": "INTEGER"
+}
+]
